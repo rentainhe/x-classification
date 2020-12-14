@@ -54,13 +54,14 @@ def train(epoch):
         # update training loss for each iteration
         writer.add_scalar('Train/loss', loss.item(), n_iter)
 
-        for name, param in net.named_parameters():
-            layer, attr = os.path.splitext(name)
-            attr = attr[1:]
-            writer.add_histogram("{}/{}".format(layer,attr), param, epoch)
+    for name, param in net.named_parameters():
+        layer, attr = os.path.splitext(name)
+        attr = attr[1:]
+        writer.add_histogram("{}/{}".format(layer,attr), param, epoch)
 
-        finish = time.time()
-        print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
+    finish = time.time()
+    print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
+
 @torch.no_grad()
 def eval_training(epoch=0, tb=True):
 
