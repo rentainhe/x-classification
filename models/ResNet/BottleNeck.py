@@ -28,7 +28,3 @@ class BottleNeck(nn.Module):
 
     def forward(self, x):
         return nn.ReLU(inplace=True)(self.residual_function(x) + self.shortcut(x))
-
-residual_block = BottleNeck(64,256,1)
-x = torch.randn(1,64,32,32)
-print(residual_block(x).size()) # 1,1024,32,32 维度加深4倍
