@@ -6,15 +6,17 @@ class Path_Configs:
 
     def init_path(self):
 
-        self.DATA_PATH = {
+        self.data_path = {
             'cifar10' : './data/cifar10',
             'cifar100' : './data/cifar100',
             'imagenet' : './data/imagenet'
         }  # where to store your data
 
-        self.LOG_PATH = './results/log'  # training log
+        self.result_logfile_path = './results/log'  # training log
 
-        self.CKPTS_PATH = './ckpts'  # where to store your model
+        self.ckpts_path = './ckpts'  # where to store your model
+
+        self.tensorboard_file_path = './runs' # where to store tensorboard file
 
         # if directory doesn't exist, create it
         if 'log' not in os.listdir('./results'):
@@ -22,3 +24,6 @@ class Path_Configs:
 
         if 'ckpts' not in os.listdir('./'):
             os.mkdir('./ckpts')
+
+        if 'runs' not in os.listdir('./'):
+            os.mkdir('./runs')

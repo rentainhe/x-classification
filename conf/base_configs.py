@@ -8,33 +8,34 @@ from types import MethodType
 class Base_Configs(Path_Configs):
     def __init__(self):
         super(Base_Configs, self).__init__()
+        # ------------------------
+        # ---- Device Control ----
+        # ------------------------
+        self.gpu='0'  # Setting devices, If use multi-gpu training, you can set e.g '0,1,2' instead
+        self.seed = random.randint(0, 9999999)  # Set Seed For CPU and GPUs
 
-        # Set Devices
-        # If use multi-gpu training, you can set e.g '0,1,2' instead
-        self.gpu='0'
-
-        # Set Seed For CPU and GPUs
-        self.seed = random.randint(0, 9999999)
-
-        # Version Control
-        self.version = str(self.seed)
-
-        # Use checkpoint to resume training
-        self.resume = False
-
-        self.ckpt_version = self.version
-
+        # -------------------------
+        # ---- Version Control ----
+        # -------------------------
+        self.version = str(self.seed)  # Version Control
+        self.resume = False  # Use checkpoint to resume training
+        self.ckpt_version = self.version  # Resume training version or testing version
         self.ckpt_path = None
+        self.ckpt_epoch = 0  # Resume training epoch or testing epoch
 
+        # ---------------------------
+        # ---- Data Load Control ----
+        # ---------------------------
         self.batch_size = 64
-
         self.num_workers = 8
-
         self.pin_mem = True
 
+        # --------------------------
+        # ---- Training Control ----
+        # --------------------------
         self.gradient_accumulation_steps = 1
-
         self.eval_every_epoch = True
+
 
     def str_to_bool(self, args):
         bool_list = [
@@ -68,14 +69,14 @@ class Base_Configs(Path_Configs):
 
         # ----------------------- setting devices
         os.environ['CUDA_VISIBLE_DEVICES'] = self.gpu
-        self.N_GPU = len(self.gpu.split(','))
-        self.DEVICES = [ _ for _ in range(self.N_GPU)]
+        self.num_gpus = len(self.gpu.split(','))
+        self.devices = [ _ for _ in range(self.num_gpus)]
         torch.set_num_threads(2)
 
         # ----------------------- setting seed
         # fix pytorch seed
         torch.manual_seed(self.seed)
-        if self.N_GPU < 2:
+        if self.num_gpus < 2:
             torch.cuda.manual_seed(self.seed)
         else:
             torch.cuda.manual_seed_all(self.seed)
