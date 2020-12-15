@@ -25,10 +25,9 @@ if __name__ == '__main__':
     # load basic config
     config = Base_Configs()
     args = config.str_to_bool(args)
-    for arg in args:
-        print(arg)
+    print(dir(args))
     args_dict = config.parse_to_dict(args)
 
     config.add_args(args_dict)
     config.process()
-    # print(config)
+    print(config)

@@ -52,6 +52,8 @@ class Base_Configs(Path_Configs):
     def parse_to_dict(self, args):
         args_dict = {}
         for arg in dir(args):
+            # dir(args) 里 包含 __str__ _get_kwargs 等其他方法，所以为了筛选出所需要的config
+            # 需要判断 args.startwith('_')
             if not arg.startswith('_') and not isinstance(getattr(args, arg), MethodType):
                 if getattr(args, arg) is not None:
                     args_dict[arg] = getattr(args, arg)
@@ -96,6 +98,7 @@ class Base_Configs(Path_Configs):
         # print Hyper Parameters
         config_str = ''
         for attr in dir(self):
+            # 如果不加 attr.startwith('__')会打印出很多额外的参数，是自身自带的一些默认方法和属性
             if not attr.startswith('__') and not isinstance(getattr(self, attr), MethodType):
                 config_str += '{ %-17s }->' % attr + str(getattr(self, attr)) + '\n'
 
