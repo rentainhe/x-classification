@@ -1,0 +1,147 @@
+import os, torch, datetime, shutil, time
+import numpy as np
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.utils.data as Data
+from datasets.dataset_loader import get_train_loader
+from datasets.dataset_loader import get_test_loader
+from models.get_network import get_network
+import torch
+import torch.optim as optim
+import torchvision
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+from util import get_network, get_training_dataloader, get_test_dataloader, WarmUpLR, \
+    most_recent_folder, most_recent_weights, last_epoch, best_acc_weights
+
+
+def train_engine(__C):
+    # define network
+    net = get_network(__C)
+    net = net.cuda()
+    if __C.gpu_nums > 1 :
+        net = nn.DataParallel(net, device_ids=__C.devices)
+
+    # define dataloader
+    train_loader = get_training_dataloader(__C)
+    test_loader = get_test_loader(__C)
+
+
+    # define optimize params and training schedule
+    loss_function = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(net.parameters(), lr=__C.lr, momentum=0.9, weight_decay=5e-4)
+    train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=__C.milestones, gamma=__C.lr_decay_rate)
+    iter_per_epoch = len(train_loader)
+    warmup_schedule = WarmUpLR(optimizer, iter_per_epoch * __C.warmup_epoch)
+
+    # define tensorboard writer
+    writer = SummaryWriter(log_dir=os.path.join(__C.tensorbard_log_dir,__C.net,__C.version))
+
+    # define model save dir
+    checkpoint_path = os.path.join(__C.ckpts_dir, __C.net, __C.version)
+    if not os.path.exists(__C.ckpts_dir):
+        os.makedirs(__C.ckpts_dir)
+    checkpoint_path = os.path.join(checkpoint_path, '{net}-{epoch}-{type}.pth')
+
+    # define log save dir
+    log_path = os.path.join(__C.result_log_dir, __C.net)
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    log_path = os.path.join(log_path,__C.version,'.txt')
+
+    # write the hyper parameters to log
+    logfile = open(log_path, 'a+')
+    logfile.write(str(__C))
+    logfile.close()
+
+    best_acc = 0.0
+    loss_sum = 0
+    for epoch in range(1, __C.epoch):
+        if epoch > __C.warmup_epoch:
+            train_scheduler.step(epoch)
+
+        start = time.time()
+        net.train()
+        for step, (images, labels) in enumerate(train_loader):
+            if epoch <= __C.warmup_epoch:
+                warmup_schedule.step()
+            images = images.cuda()
+            labels = labels.cuda()
+            # using gradient accumulation step
+
+            optimizer.zero_grad()
+            loss_tmp = 0
+            for accu_step in range(__C.gradient_accumulation_steps):
+                loss_tmp = 0
+                sub_images = images[accu_step * __C.sub_batch_size:
+                                    (accu_step + 1) * __C.sub_batch_size]
+                sub_labels = labels[accu_step * __C.sub_batch_size:
+                                    (accu_step + 1) * __C.sub_batch_size]
+                outputs = net(sub_images)
+                loss = loss_function(outputs, sub_labels)
+                loss.backward()
+                loss_tmp += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
+                loss_sum += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
+
+            optimizer.step()
+            n_iter = (epoch-1) * len(train_loader) + step + 1
+            print(
+                '[{Version}] [{Model}] Training Epoch: {epoch} [{trained_samples}/{total_samples}]\tLoss: {:0.4f}\tLR: {:0.6f}'.format(
+                    loss_tmp,
+                    optimizer.param_groups[0]['lr'],
+                    Version=__C.version,
+                    Model=__C.model,
+                    epoch=epoch,
+                    trained_samples=step * __C.batch_size + len(images),
+                    total_samples=len(train_loader.dataset)
+                ))
+            # update training loss for each iteration
+            writer.add_scalar('Train/loss', loss_sum, n_iter)
+
+        # update the result logfile
+        logfile = open(log_path, 'a+')
+        logfile.write(
+            'Epoch: ' + str(epoch) +
+            ', Loss: ' + str(loss_sum / len(train_loader.dataset)) +
+            ', Lr: ' + str(optimizer.param_groups[0]['lr'])
+        )
+        logfile.close()
+        finish = time.time()
+        print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
+
+        if __C.eval_every_epoch:
+            start = time.time()
+            net.eval()
+            test_loss = 0.0
+            correct = 0.0
+            for (images, labels) in test_loader:
+                images = images.cuda()
+                labels = labels.cuda()
+                eval_outputs = net(images)
+                eval_loss = loss_function(eval_outputs, labels)
+                test_loss += eval_loss.item()
+                _, preds = eval_outputs.max(1)
+                correct += preds.eq(labels).sum()
+            finish = time.time()
+            print('Evaluating Network.....')
+            print('Test set: Average loss: {:.4f}, Accuracy: {:.4f}, Time consumed:{:.2f}s'.format(
+                test_loss / len(test_loader.dataset),
+                correct.float() / len(test_loader.dataset),
+                finish - start
+            ))
+            print()
+            # update the result logfile
+            logfile = open(log_path, 'a+')
+            logfile.write(
+                'Test Average loss: ' + str(test_loss/len(test_loader.dataset)) +
+                ', Accuracy: ' + str(np.round((correct.float()/len(test_loader.dataset),4))) +
+                '\n'
+            )
+            logfile.close()
+
+            # update the tensorboard log file
+            writer.add_scalar('Test/Average loss', test_loss / len(test_loader.dataset), epoch)
+            writer.add_scalar('Test/Accuracy', correct.float() / len(test_loader.dataset), epoch)
+
+

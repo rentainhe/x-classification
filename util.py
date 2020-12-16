@@ -20,7 +20,7 @@ def get_network(args):
     """
 
     if args.net == 'resnet18':
-        from models.ResNet import resnet18
+        from models.net.ResNet import resnet18
         net = resnet18()
     else:
         print('the network name you have entered is not supported yet')

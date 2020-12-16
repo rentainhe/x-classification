@@ -1,9 +1,9 @@
-from conf.path_configs import Path_Configs
 import os
 import torch
 import random
 import numpy as np
 from types import MethodType
+from conf.path_configs import Path_Configs
 
 class Base_Configs(Path_Configs):
     def __init__(self):
@@ -13,6 +13,13 @@ class Base_Configs(Path_Configs):
         # ------------------------
         self.gpu='0'  # Setting devices, If use multi-gpu training, you can set e.g '0,1,2' instead
         self.seed = random.randint(0, 9999999)  # Set Seed For CPU and GPUs
+
+        # ----------------------
+        # ---- Path Control ----
+        # ----------------------
+        self.result_logfile_path = './results/log'  # training log
+        self.ckpts_path = './ckpts'  # where to store your model
+        self.tensorboard_log_dir = './runs'  # where to store tensorboard file
 
         # -------------------------
         # ---- Version Control ----
@@ -26,6 +33,7 @@ class Base_Configs(Path_Configs):
         # ---------------------------
         # ---- Data Load Control ----
         # ---------------------------
+        self.dataset = 'imagenet'
         self.batch_size = 64
         self.num_workers = 8
         self.pin_mem = True
@@ -54,7 +62,7 @@ class Base_Configs(Path_Configs):
         args_dict = {}
         for arg in dir(args):
             # dir(args) 里 包含 __str__ _get_kwargs 等其他方法，所以为了筛选出所需要的config
-            # 需要判断 args.startwith('_')
+            # 需要判断 args.startwith('_') 以及 是不是系统自带的 MethodType
             if not arg.startswith('_') and not isinstance(getattr(args, arg), MethodType):
                 if getattr(args, arg) is not None:
                     args_dict[arg] = getattr(args, arg)
@@ -94,6 +102,16 @@ class Base_Configs(Path_Configs):
 
         # set small eval batch size will reduce gpu memory usage
         self.eval_batch_size = int(self.sub_batch_size / 2)
+
+        if self.dataset == 'cifar10':
+            self.dataset_mean = (0.5, 0.5, 0.5)
+            self.dataset_std = (0.5, 0.5, 0.5)
+        elif self.dataset == 'cifar100':
+            self.dataset_mean = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
+            self.dataset_std = (0.2673342858792401, 0.2564384629170883, 0.27615047132568404)
+        elif self.dataset == 'imagenet':
+            self.dataset_mean = (0.5, 0.5, 0.5)
+            self.dataset_std = (0.5, 0.5, 0.5)
 
     def __str__(self):
         # print Hyper Parameters

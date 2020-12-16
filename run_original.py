@@ -1,7 +1,5 @@
-import argparse
-from conf import configs
-import os
-from utils.train_engine import train_engine
+import argparse, yaml
+from conf.base_configs import Base_Configs
 
 def parse_args():
     parser = argparse.ArgumentParser(description='MAC_Classification Args')
@@ -14,7 +12,6 @@ def parse_args():
     parser.add_argument('--batch_size', type=int, default=128, help='batch size for dataloader')
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1, help='warm up training phase')
     parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate')
-    parser.add_argument('--lr_decay_rate', type=int, default=0.2, help='learning rate decay')
     parser.add_argument('--resume', action='store_true', default=False, help='resume training')
     parser.add_argument('--warmup_epoch', type=int, default=1, help='warmup epochs')
     parser.add_argument('--epoch', type=int, default=200, help='total epochs')
@@ -24,19 +21,24 @@ def parse_args():
     return args
 
 if __name__ == '__main__':
-
     args = parse_args()
-    args_dict = configs.parse_to_dict(args)
-    configs.add_args(args_dict)
+    # load model specific config
+    cfg_file = "conf/{}/{}.yml".format(args.dataset, args.model)
+    with open(cfg_file, 'r') as f:
+        yaml_dict = yaml.load(f)
 
-    configs.path_init()
-    configs.training_init()
+    # load basic global config
+    config = Base_Configs()
+    args = config.str_to_bool(args)
+    args_dict = config.parse_to_dict(args)
 
-    print("Hyper parameters:")
-    print(configs)
+    # combine two configs together
+    args_dict = {**yaml_dict, **args_dict}
+    config.add_args(args_dict)
+    config.process()
+    print("Hyper parameters .......")
+    print(config)
 
-    if configs.run_mode == 'train':
-        train_engine(configs)
 
 
 

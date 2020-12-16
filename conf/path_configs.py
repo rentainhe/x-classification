@@ -16,7 +16,7 @@ class Path_Configs:
 
         self.ckpts_path = './ckpts'  # where to store your model
 
-        self.tensorboard_file_path = './runs' # where to store tensorboard file
+        self.tensorboard_log_dir = './runs' # where to store tensorboard file
 
         # if directory doesn't exist, create it
         if 'log' not in os.listdir('./results'):
