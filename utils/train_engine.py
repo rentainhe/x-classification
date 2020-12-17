@@ -1,4 +1,5 @@
 import os, time
+import torch
 import torch.nn as nn
 from datasets.dataset_loader import get_train_loader
 from datasets.dataset_loader import get_test_loader
@@ -6,7 +7,7 @@ from models.get_network import get_network
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 from utils.util import WarmUpLR
-
+from criterion import LabelSmoothingCrossEntropy
 
 def train_engine(__C):
     # define network
@@ -22,7 +23,10 @@ def train_engine(__C):
 
 
     # define optimize params and training schedule
-    loss_function = nn.CrossEntropyLoss()
+    if __C.label_smoothing:
+        loss_function = LabelSmoothingCrossEntropy(__C.smoothing)
+    else:
+        loss_function = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=__C.lr, momentum=0.9, weight_decay=5e-4)
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=__C.milestones, gamma=__C.lr_decay_rate)
     iter_per_epoch = len(train_loader)
@@ -97,7 +101,7 @@ def train_engine(__C):
         logfile = open(log_path, 'a+')
         logfile.write(
             'Epoch: ' + str(epoch) +
-            ', Loss: ' + str(loss_sum / len(train_loader.dataset)) +
+            ', Train Average Loss: {:.4f}'.format(loss_sum/len(train_loader.dataset)) +
             ', Lr: ' + str(optimizer.param_groups[0]['lr']) +
             ', '
         )
@@ -129,7 +133,7 @@ def train_engine(__C):
             # update the result logfile
             logfile = open(log_path, 'a+')
             logfile.write(
-                'Test Average loss: ' + str(test_loss/len(test_loader.dataset)) +
+                'Test Average loss: {:.4f}'.format(test_loss/len(test_loader.dataset)) +
                 ', Accuracy: {:.4f}'.format(correct.float() / len(test_loader.dataset)) +
                 '\n'
             )

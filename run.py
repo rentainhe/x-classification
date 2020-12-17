@@ -20,6 +20,8 @@ def parse_args():
     parser.add_argument('--epoch', type=int, default=200, help='total epochs')
     parser.add_argument('--ckpt_e', type=int, dest='ckpt_epoch')
     parser.add_argument('--ckpt_v', type=str, dest='ckpt_version')
+    parser.add_argument('--label_smoothing', action='store_true', default=False, help='if using label smoothing')
+    parser.add_argument('--smoothing', type=int, default=0.1, help='control label smoothing value')
     args = parser.parse_args()
     return args
 
