@@ -1,4 +1,3 @@
-import conf.global_settings as settings
 import conf.global_configs as global_configs
 from types import MethodType
 import os
