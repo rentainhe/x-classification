@@ -10,6 +10,9 @@ def get_network(args):
     elif args.model == 'nasnet':
         from models.net import nasnet
         net = nasnet()
+    elif args.model == 'mobilenet':
+        from models.net import mobilenet
+        net = mobilenet()
     else:
         print('the network name you have entered is not supported yet')
         sys.exit()
