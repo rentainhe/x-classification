@@ -78,8 +78,10 @@ def train_engine(__C):
                 outputs = net(sub_images)
                 loss = loss_function(outputs, sub_labels)
                 loss.backward()
-                loss_tmp += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
-                loss_sum += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
+                # loss_tmp += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
+                # loss_sum += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
+                loss_tmp += loss.cpu().data.numpy()
+                loss_sum += loss.cpu().data.numpy()
 
             optimizer.step()
             n_iter = (epoch-1) * len(train_loader) + step + 1
