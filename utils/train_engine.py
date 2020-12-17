@@ -104,7 +104,7 @@ def train_engine(__C):
         logfile.write(
             'Epoch: ' + str(epoch) +
             ', Train Average Loss: {:.4f}'.format(loss_sum/len(train_loader.dataset)) +
-            ', Lr: ' + str(optimizer.param_groups[0]['lr']) +
+            ', Lr: {:.6f}' + optimizer.param_groups[0]['lr'] +
             ', '
         )
         logfile.close()
