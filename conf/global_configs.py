@@ -29,6 +29,5 @@ num_workers = 8
 pin_memory = True
 eval_every_epoch = True
 
-# save configs
-data_format = '%A_%d_%B_%Y_%Hh_%Mm_%Ss'
-time_now = datetime.now().strftime(data_format)
+# create time
+time_now = datetime.now().strftime('%A_%d_%B_%Y_%Hh_%Mm_%Ss')
