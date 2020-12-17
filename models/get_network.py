@@ -7,6 +7,9 @@ def get_network(args):
     if args.model == 'resnet18':
         from models.net import resnet18
         net = resnet18()
+    elif args.model == 'nasnet':
+        from models.net import nasnet
+        net = nasnet()
     else:
         print('the network name you have entered is not supported yet')
         sys.exit()
