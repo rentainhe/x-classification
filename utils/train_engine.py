@@ -12,7 +12,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from util import get_network, get_training_dataloader, get_test_dataloader, WarmUpLR, \
+from util import get_training_dataloader, get_test_dataloader, WarmUpLR, \
     most_recent_folder, most_recent_weights, last_epoch, best_acc_weights
 
 
@@ -20,11 +20,12 @@ def train_engine(__C):
     # define network
     net = get_network(__C)
     net = net.cuda()
-    if __C.gpu_nums > 1 :
+
+    if __C.n_gpu > 1 :
         net = nn.DataParallel(net, device_ids=__C.devices)
 
     # define dataloader
-    train_loader = get_training_dataloader(__C)
+    train_loader = get_train_loader(__C)
     test_loader = get_test_loader(__C)
 
 
@@ -36,19 +37,19 @@ def train_engine(__C):
     warmup_schedule = WarmUpLR(optimizer, iter_per_epoch * __C.warmup_epoch)
 
     # define tensorboard writer
-    writer = SummaryWriter(log_dir=os.path.join(__C.tensorbard_log_dir,__C.net,__C.version))
+    writer = SummaryWriter(log_dir=os.path.join(__C.tensorboard_log_dir,__C.model,__C.version))
 
     # define model save dir
-    checkpoint_path = os.path.join(__C.ckpts_dir, __C.net, __C.version)
+    checkpoint_path = os.path.join(__C.ckpts_dir, __C.model, __C.version)
     if not os.path.exists(__C.ckpts_dir):
         os.makedirs(__C.ckpts_dir)
     checkpoint_path = os.path.join(checkpoint_path, '{net}-{epoch}-{type}.pth')
 
     # define log save dir
-    log_path = os.path.join(__C.result_log_dir, __C.net)
+    log_path = os.path.join(__C.result_log_dir, __C.model)
     if not os.path.exists(log_path):
         os.makedirs(log_path)
-    log_path = os.path.join(log_path,__C.version,'.txt')
+    log_path = os.path.join(log_path,__C.version+'.txt')
 
     # write the hyper parameters to log
     logfile = open(log_path, 'a+')
@@ -97,14 +98,16 @@ def train_engine(__C):
                     total_samples=len(train_loader.dataset)
                 ))
             # update training loss for each iteration
-            writer.add_scalar('Train/loss', loss_sum, n_iter)
+
+            writer.add_scalar('Train/loss', loss_tmp, n_iter)
 
         # update the result logfile
         logfile = open(log_path, 'a+')
         logfile.write(
             'Epoch: ' + str(epoch) +
             ', Loss: ' + str(loss_sum / len(train_loader.dataset)) +
-            ', Lr: ' + str(optimizer.param_groups[0]['lr'])
+            ', Lr: ' + str(optimizer.param_groups[0]['lr']) +
+            ', '
         )
         logfile.close()
         finish = time.time()
@@ -135,7 +138,7 @@ def train_engine(__C):
             logfile = open(log_path, 'a+')
             logfile.write(
                 'Test Average loss: ' + str(test_loss/len(test_loader.dataset)) +
-                ', Accuracy: ' + str(np.round((correct.float()/len(test_loader.dataset),4))) +
+                ', Accuracy: {:.4f}'.format(correct.float() / len(test_loader.dataset)) +
                 '\n'
             )
             logfile.close()

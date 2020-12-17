@@ -20,7 +20,7 @@ def get_train_loader(configs):
                                     download=True,
                                     transform=transform_train)
     elif configs.dataset == "cifar100":
-        trainset = datasets.CIFAR10(root=configs.data_path['cifar100'],
+        trainset = datasets.CIFAR100(root=configs.data_path['cifar100'],
                                     train=True,
                                     download=True,
                                     transform=transform_train)
@@ -48,7 +48,7 @@ def get_test_loader(configs):
                                     download=True,
                                     transform=transform_test)
     elif configs.dataset == "cifar100":
-        testset = datasets.CIFAR10(root=configs.data_path['cifar100'],
+        testset = datasets.CIFAR100(root=configs.data_path['cifar100'],
                                     train=False,
                                     download=True,
                                     transform=transform_test)
