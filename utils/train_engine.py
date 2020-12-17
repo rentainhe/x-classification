@@ -37,8 +37,8 @@ def train_engine(__C):
 
     # define model save dir
     checkpoint_path = os.path.join(__C.ckpts_dir, __C.model, __C.version)
-    if not os.path.exists(__C.ckpts_dir):
-        os.makedirs(__C.ckpts_dir)
+    if not os.path.exists(checkpoint_path):
+        os.makedirs(checkpoint_path)
     checkpoint_path = os.path.join(checkpoint_path, '{net}-{epoch}-{type}.pth')
 
     # define log save dir
@@ -123,24 +123,38 @@ def train_engine(__C):
                 _, preds = eval_outputs.max(1)
                 correct += preds.eq(labels).sum()
             finish = time.time()
+
+            test_average_loss = test_loss / len(test_loader.dataset)  # 测试平均 loss
+            acc = correct.float() / len(test_loader.dataset)  # 测试准确率
+
+            # save model after every "save_epoch" epoches and model with the best acc
+            if epoch > __C.milestones[1] and best_acc < acc:
+                torch.save(net.state_dict(), checkpoint_path.format(net=__C.model, epoch=epoch, type='best'))
+                best_acc = acc
+                continue
+            if not epoch % __C.save_epoch:
+                torch.save(net.state_dict(), checkpoint_path.format(net=__C.model, epoch=epoch, type='regular'))
+
+            # print the testing information
             print('Evaluating Network.....')
             print('Test set: Average loss: {:.4f}, Accuracy: {:.4f}, Time consumed:{:.2f}s'.format(
-                test_loss / len(test_loader.dataset),
-                correct.float() / len(test_loader.dataset),
+                test_average_loss,
+                acc,
                 finish - start
             ))
             print()
+
             # update the result logfile
             logfile = open(log_path, 'a+')
             logfile.write(
-                'Test Average loss: {:.4f}'.format(test_loss/len(test_loader.dataset)) +
-                ', Accuracy: {:.4f}'.format(correct.float() / len(test_loader.dataset)) +
+                'Test Average loss: {:.4f}'.format(test_average_loss) +
+                ', Accuracy: {:.4f}'.format(acc) +
                 '\n'
             )
             logfile.close()
 
             # update the tensorboard log file
-            writer.add_scalar('Test/Average loss', test_loss / len(test_loader.dataset), epoch)
-            writer.add_scalar('Test/Accuracy', correct.float() / len(test_loader.dataset), epoch)
+            writer.add_scalar('Test/Average loss', test_average_loss, epoch)
+            writer.add_scalar('Test/Accuracy', acc, epoch)
 
 
