@@ -1,27 +1,34 @@
 import math
 from torch.optim.lr_scheduler import LambdaLR
+from torch.optim.lr_scheduler import MultiStepLR
 
 
-class ConstantLRSchedule(LambdaLR):
-    """ Constant learning rate schedule.
+class WarmupMultiStepSchedule(LambdaLR):
+    """ Linear warmup and then MultiStep decay
     """
-    def __init__(self, optimizer, last_epoch=-1):
-        super(ConstantLRSchedule, self).__init__(optimizer, lambda _: 1.0, last_epoch=last_epoch)
 
-
-class WarmupConstantSchedule(LambdaLR):
-    """ Linear warmup and then constant.
-        Linearly increases learning rate schedule from 0 to 1 over `warmup_steps` training steps.
-        Keeps learning rate schedule equal to 1. after warmup_steps.
-    """
-    def __init__(self, optimizer, warmup_steps, last_epoch=-1):
+    def __init__(self, __C, optimizer, warmup_steps, t_total, last_epoch=-1):
         self.warmup_steps = warmup_steps
-        super(WarmupConstantSchedule, self).__init__(optimizer, self.lr_lambda, last_epoch=last_epoch)
+        self.t_total = t_total
+        self.__C = __C
+        super(WarmupMultiStepSchedule, self).__init__(optimizer, self.lr_lambda, last_epoch=last_epoch)
 
     def lr_lambda(self, step):
         if step < self.warmup_steps:
-            return float(step) / float(max(1.0, self.warmup_steps))
-        return 1.
+            return float(step) / float(max(1, self.warmup_steps))
+        else:
+            if step <= min(self.__C.milestones):
+                return 1.0
+            elif step >= max(self.__C.milestones):
+                return 1.0 * (self.__C.lr_decay_rate**(len(self.__C.milestones)))
+            else:
+                lr_list = []
+                for i in range(len(self.__C.milestones)):
+                    if step < self.__C.milestones[i]:
+                        continue
+                    else:
+                        lr_list.append(1.0*(self.__C.lr_decay_rate**(i+1)))
+                return lr_list[-1]
 
 
 class WarmupLinearSchedule(LambdaLR):
