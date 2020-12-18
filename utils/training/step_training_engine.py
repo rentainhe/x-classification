@@ -1,4 +1,4 @@
-import os, time
+import os, time, logging
 import torch
 import torch.nn as nn
 from datasets.dataset_loader import get_train_loader
@@ -9,6 +9,10 @@ from torch.utils.tensorboard import SummaryWriter
 from utils.util import WarmUpLR
 from criterion import LabelSmoothingCrossEntropy
 from utils.scheduler import WarmupLinearSchedule, WarmupCosineSchedule, WarmupMultiStepSchedule
+from tqdm import tqdm
+import numpy as np
+
+logger = logging.getLogger(__name__)
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -27,13 +31,68 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
+def simple_accuracy(preds, labels):
+    return (preds == labels).mean()
+
+def valid(__C, model, writer, test_loader, global_step):
+    # Validation!
+    eval_losses = AverageMeter()
+
+    logger.info("***** Running Validation *****")
+    logger.info("  Num steps = %d", len(test_loader))
+    logger.info("  Batch size = %d", __C.eval_batch_size)
+
+    model.eval()
+    all_preds, all_label = [], []
+    epoch_iterator = tqdm(test_loader,
+                          desc="Validating... (loss=X.X)",
+                          bar_format="{l_bar}{r_bar}",
+                          dynamic_ncols=True)
+    if __C.label_smoothing:
+        loss_function = LabelSmoothingCrossEntropy(__C.smoothing)
+    else:
+        loss_function = torch.nn.CrossEntropyLoss()
+
+    for step, (images, labels) in enumerate(epoch_iterator):
+        images = images.cuda()
+        labels = labels.cuda()
+        with torch.no_grad():
+            eval_outputs = model(images)
+            eval_loss = loss_function(images, labels)
+            eval_losses.update(eval_loss.item())
+            preds = torch.argmax(eval_outputs, dim=-1)
+
+        if len(all_preds) == 0:
+            all_preds.append(preds.detach().cpu().numpy())
+            all_label.append(labels.detach().cpu().numpy())
+        else:
+            all_preds[0] = np.append(
+                all_preds[0], preds.detach().cpu().numpy(), axis=0
+            )
+            all_label[0] = np.append(
+                all_label[0], labels.detach().cpu().numpy(), axis=0
+            )
+        epoch_iterator.set_description("Validating... (loss=%2.5f)" % eval_losses.val)
+
+    all_preds, all_label = all_preds[0], all_label[0]
+    accuracy = simple_accuracy(all_preds, all_label)
+
+    logger.info("\n")
+    logger.info("Validation Results")
+    logger.info("Global Steps: %d" % global_step)
+    logger.info("Valid Loss: %2.5f" % eval_losses.avg)
+    logger.info("Valid Accuracy: %2.5f" % accuracy)
+
+    writer.add_scalar("test/accuracy", scalar_value=accuracy, global_step=global_step)
+    return accuracy
+
+
 def train_engine(__C):
     # define network
     net = get_network(__C)
     net = net.cuda()
 
-    if __C.n_gpu > 1:
-        net = nn.DataParallel(net, device_ids=__C.devices)
+    __C.batch_size = __C.batch_size // __C.gradient_accumulation_steps
 
     # define dataloader
     train_loader = get_train_loader(__C)
@@ -60,9 +119,6 @@ def train_engine(__C):
     elif __C.decay_type == 'linear':
         train_scheduler = WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps, t_total=total_steps)
 
-    # iter_per_epoch = len(train_loader)
-    # warmup_schedule = WarmUpLR(optimizer, iter_per_epoch * __C.warmup_epoch)
-
     # define tensorboard writer
     writer = SummaryWriter(log_dir=os.path.join(__C.tensorboard_log_dir, __C.model, __C.version))
 
@@ -83,123 +139,49 @@ def train_engine(__C):
     logfile.write(str(__C))
     logfile.close()
 
-    best_acc = 0.0
-    loss_sum = 0
-    global_step = 0
+    # Train!
+    logger.info("***** Running training *****")
+    logger.info("  Total optimization steps = %d", __C.num_steps)
+    logger.info("  Instantaneous batch size per GPU = %d", __C.batch_size)
+    logger.info("  Gradient Accumulation steps = %d", __C.gradient_accumulation_steps)
+
+    net.zero_grad()
+    losses = AverageMeter()
+    global_step, best_acc = 0, 0
     while True:
         net.train()
+        epoch_iterator = tqdm(train_loader,
+                              desc="Training (X / X Steps) (loss=X.X)",
+                              bar_format="{l_bar}{r_bar}",
+                              dynamic_ncols=True)
         for step, (images, labels) in enumerate(train_loader):
             images = images.cuda()
             labels = labels.cuda()
             loss = loss_function(images, labels)
+            if __C.gradient_accumulation_steps > 1:
+                loss = loss / __C.gradient_accumulation_steps
+            else:
+                loss.backward()
+
+            if (step + 1) % __C.gradient_accumulation_steps == 0:
+                losses.update(loss.item() * __C.gradient_accumulation_steps)
+                torch.nn.utils.clip_grad_norm_(net.parameters(), __C.max_grad_norm)
+                train_scheduler.step()
+                optimizer.step()
+                optimizer.zero_grad()
+                global_step += 1
+
+                epoch_iterator.set_description(
+                    "Training (%d / %d Steps) (loss=%2.5f)" % (global_step, total_steps, losses.val)
+                )
+
+                writer.add_scalar("train/loss", scalar_value=losses.val, global_step=global_step)
+                writer.add_scalar("train/lr", scalar_value=train_scheduler.get_lr()[0], global_step=global_step)
+
+                if global_step % __C.eval_every == 0:
+                    accuracy = valid()
 
 
 
-
-
-    # for epoch in range(1, __C.epoch):
-    #     if epoch > __C.warmup_epoch:
-    #         train_scheduler.step(epoch)
-    #
-    #     start = time.time()
-    #     net.train()
-    #     for step, (images, labels) in enumerate(train_loader):
-    #         if epoch <= __C.warmup_epoch:
-    #             warmup_schedule.step()
-    #         images = images.cuda()
-    #         labels = labels.cuda()
-    #         # using gradient accumulation step
-    #
-    #         optimizer.zero_grad()
-    #         loss_tmp = 0
-    #         for accu_step in range(__C.gradient_accumulation_steps):
-    #             loss_tmp = 0
-    #             sub_images = images[accu_step * __C.sub_batch_size:
-    #                                 (accu_step + 1) * __C.sub_batch_size]
-    #             sub_labels = labels[accu_step * __C.sub_batch_size:
-    #                                 (accu_step + 1) * __C.sub_batch_size]
-    #             outputs = net(sub_images)
-    #             loss = loss_function(outputs, sub_labels)
-    #             loss.backward()
-    #             # loss_tmp += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
-    #             # loss_sum += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
-    #             loss_tmp += loss.cpu().data.numpy()
-    #             loss_sum += loss.cpu().data.numpy()
-    #
-    #         optimizer.step()
-    #         n_iter = (epoch - 1) * len(train_loader) + step + 1
-    #         print(
-    #             '[{Version}] [{Model}] Training Epoch: {epoch} [{trained_samples}/{total_samples}]\tLoss: {:0.4f}\tLR: {:0.6f}'.format(
-    #                 loss_tmp,
-    #                 optimizer.param_groups[0]['lr'],
-    #                 Version=__C.version,
-    #                 Model=__C.model,
-    #                 epoch=epoch,
-    #                 trained_samples=step * __C.batch_size + len(images),
-    #                 total_samples=len(train_loader.dataset)
-    #             ))
-    #         # update training loss for each iteration
-    #
-    #         writer.add_scalar('Train/loss', loss_tmp, n_iter)
-    #
-    #     # update the result logfile
-    #     logfile = open(log_path, 'a+')
-    #     logfile.write(
-    #         'Epoch: ' + str(epoch) +
-    #         ', Train Average Loss: {:.4f}'.format(loss_sum / len(train_loader.dataset)) +
-    #         ', Lr: {:.6f}'.format(optimizer.param_groups[0]['lr']) +
-    #         ', '
-    #     )
-    #     logfile.close()
-    #     finish = time.time()
-    #     print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
-    #
-    #     if __C.eval_every_epoch:
-    #         start = time.time()
-    #         net.eval()
-    #         test_loss = 0.0
-    #         correct = 0.0
-    #         for (images, labels) in test_loader:
-    #             images = images.cuda()
-    #             labels = labels.cuda()
-    #             eval_outputs = net(images)
-    #             eval_loss = loss_function(eval_outputs, labels)
-    #             test_loss += eval_loss.item()
-    #             _, preds = eval_outputs.max(1)
-    #             correct += preds.eq(labels).sum()
-    #         finish = time.time()
-    #
-    #         test_average_loss = test_loss / len(test_loader.dataset)  # 测试平均 loss
-    #         acc = correct.float() / len(test_loader.dataset)  # 测试准确率
-    #
-    #         # save model after every "save_epoch" epoches and model with the best acc
-    #         if epoch > __C.milestones[1] and best_acc < acc:
-    #             torch.save(net.state_dict(), checkpoint_path.format(net=__C.model, epoch=epoch, type='best'))
-    #             best_acc = acc
-    #             continue
-    #         if not epoch % __C.save_epoch:
-    #             torch.save(net.state_dict(), checkpoint_path.format(net=__C.model, epoch=epoch, type='regular'))
-    #
-    #         # print the testing information
-    #         print('Evaluating Network.....')
-    #         print('Test set: Average loss: {:.4f}, Accuracy: {:.4f}, Time consumed:{:.2f}s'.format(
-    #             test_average_loss,
-    #             acc,
-    #             finish - start
-    #         ))
-    #         print()
-    #
-    #         # update the result logfile
-    #         logfile = open(log_path, 'a+')
-    #         logfile.write(
-    #             'Test Average loss: {:.4f}'.format(test_average_loss) +
-    #             ', Accuracy: {:.4f}'.format(acc) +
-    #             '\n'
-    #         )
-    #         logfile.close()
-    #
-    #         # update the tensorboard log file
-    #         writer.add_scalar('Test/Average loss', test_average_loss, epoch)
-    #         writer.add_scalar('Test/Accuracy', acc, epoch)
 
 

@@ -14,7 +14,7 @@ tensorboard_log_dir = 'runs'
 
 # training configs
 epoch = 200
-milestones = [60, 120, 160]
+milestones = [60, 120, 160] # 30%, 60%, 80%
 save_epoch = 10
 gpu = '0'
 seed = random.randint(0, 9999999)
