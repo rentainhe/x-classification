@@ -54,7 +54,7 @@ class BottleNeck(nn.Module):
     def forward(self, x):
         return nn.ReLU(inplace=True)(self.residual_function(x) + self.shortcut(x))
 
-class resnet(nn.Module):
+class ResNet(nn.Module):
     def __init__(self, block, num_block, num_classes=100):
         super().__init__()
         self.in_channels = 64
@@ -109,4 +109,12 @@ class resnet(nn.Module):
 
 def resnet18():
     # return a resnet18 object
-    return resnet(BasicBlock, [2,2,2,2])
+    return ResNet(BasicBlock, [2,2,2,2])
+
+def resnet34():
+    # return a resnet34 object
+    return ResNet(BasicBlock, [3,4,6,3])
+
+def resnet50():
+    # return a resnet50 object
+    return ResNet(BottleNeck, [3,4,6,3])
