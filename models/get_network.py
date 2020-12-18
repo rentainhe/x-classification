@@ -10,6 +10,9 @@ def get_network(args):
     elif args.model == 'mobilenet':
         from models.net import mobilenet
         net = mobilenet()
+    elif args.model == 'mobilenetv2':
+        from models.net import mobilenetv2
+        net = mobilenetv2()
     elif args.model == 'shufflenet':
         from models.net import shufflenet
         net = shufflenet()
