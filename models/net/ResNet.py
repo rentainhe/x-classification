@@ -111,9 +111,11 @@ def resnet18():
     # return a resnet18 object
     return ResNet(BasicBlock, [2,2,2,2])
 
+
 def resnet34():
     # return a resnet34 object
     return ResNet(BasicBlock, [3,4,6,3])
+
 
 def resnet50():
     # return a resnet50 object
