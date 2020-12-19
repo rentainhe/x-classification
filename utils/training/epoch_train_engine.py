@@ -100,9 +100,9 @@ def train_engine(__C):
 
             writer.add_scalar('Epoch Train/loss', loss_tmp, n_iter)
             if epoch <= __C.warmup_epoch:
-                writer.add_scalar('Epoch Train/lr', warmup_schedule.get_lr(), epoch)
+                writer.add_scalar('Epoch Train/lr', warmup_schedule.get_lr()[0], epoch)
             else:
-                writer.add_scalar('Epoch Train/lr', train_scheduler.get_lr(), epoch)
+                writer.add_scalar('Epoch Train/lr', train_scheduler.get_lr()[0], epoch)
 
         # update the result logfile
         logfile = open(log_path, 'a+')
