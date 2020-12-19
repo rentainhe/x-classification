@@ -10,6 +10,7 @@ def parse_args():
     parser.add_argument('--run', type=str, dest='run_mode',choices=['train','test'])
     parser.add_argument('--seed', type=int, help='fix random seed')
     parser.add_argument('--eval_every_epoch', choices=['True','False'], type=str)
+    parser.add_argument('--img_size', type=int, default=32, help='Resolution size')
     parser.add_argument('--save_epoch', type=int, default=20, help="save model after every 20 epoch")
     parser.add_argument('--batch_size', type=int, default=128, help='batch size for dataloader')
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1, help='warm up training phase')
