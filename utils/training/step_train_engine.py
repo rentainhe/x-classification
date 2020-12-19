@@ -10,6 +10,7 @@ from criterion import LabelSmoothingCrossEntropy
 from utils.scheduler import WarmupLinearSchedule, WarmupCosineSchedule, WarmupMultiStepSchedule
 from tqdm import tqdm
 import numpy as np
+from utils.util import split_weights
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +102,12 @@ def train_engine(__C):
     else:
         loss_function = nn.CrossEntropyLoss()
 
-    optimizer = optim.SGD(net.parameters(), lr=__C.lr, momentum=0.9, weight_decay=5e-4)
+    # define optimizer and training parameters
+    if __C.no_bias_decay:
+        params = split_weights(net)
+    else:
+        params = net.parameters()
+    optimizer = optim.SGD(params, lr=__C.lr, momentum=0.9, weight_decay=5e-4)
 
     # define optimizer scheduler
     # len(train_loader) 就是一个epoch的steps数量

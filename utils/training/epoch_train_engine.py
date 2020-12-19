@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 from utils.util import WarmUpLR
 from criterion import LabelSmoothingCrossEntropy
+from utils.util import split_weights
 
 def train_engine(__C):
     # define network
@@ -26,7 +27,13 @@ def train_engine(__C):
         loss_function = LabelSmoothingCrossEntropy(__C.smoothing)
     else:
         loss_function = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=__C.lr, momentum=0.9, weight_decay=5e-4)
+
+    # define optimizer and training parameters
+    if __C.no_bias_decay:
+        params = split_weights(net)
+    else:
+        params = net.parameters()
+    optimizer = optim.SGD(params, lr=__C.lr, momentum=0.9, weight_decay=5e-4)
 
     # define optimizer scheduler
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=__C.milestones, gamma=__C.lr_decay_rate)
