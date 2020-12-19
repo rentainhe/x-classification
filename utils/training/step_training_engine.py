@@ -158,7 +158,8 @@ def train_engine(__C):
         for step, (images, labels) in enumerate(train_loader):
             images = images.cuda()
             labels = labels.cuda()
-            loss = loss_function(images, labels)
+            train_outputs = net(images)
+            loss = loss_function(train_outputs, labels)
             if __C.gradient_accumulation_steps > 1:
                 loss = loss / __C.gradient_accumulation_steps
             else:
