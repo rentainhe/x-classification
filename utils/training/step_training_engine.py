@@ -49,17 +49,13 @@ def valid(__C, model, writer, test_loader, global_step, loss_function):
                           desc="Validating... (loss=X.X)",
                           bar_format="{l_bar}{r_bar}",
                           dynamic_ncols=True)
-    # if __C.label_smoothing:
-    #     loss_function = LabelSmoothingCrossEntropy(__C.smoothing)
-    # else:
-    #     loss_function = torch.nn.CrossEntropyLoss()
 
     for step, (images, labels) in enumerate(epoch_iterator):
         images = images.cuda()
         labels = labels.cuda()
         with torch.no_grad():
             eval_outputs = model(images)
-            eval_loss = loss_function(images, labels)
+            eval_loss = loss_function(eval_outputs, labels)
             eval_losses.update(eval_loss.item())
             preds = torch.argmax(eval_outputs, dim=-1)
 
