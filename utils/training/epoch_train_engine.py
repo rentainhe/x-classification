@@ -8,7 +8,6 @@ import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 from utils.util import WarmUpLR
 from criterion import LabelSmoothingCrossEntropy
-from utils.scheduler import WarmupLinearSchedule, WarmupCosineSchedule
 
 def train_engine(__C):
     # define network
