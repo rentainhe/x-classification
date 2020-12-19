@@ -35,7 +35,7 @@ def simple_accuracy(preds, labels):
     return (preds == labels).mean()
 
 
-def valid(__C, model, writer, test_loader, global_step):
+def valid(__C, model, writer, test_loader, global_step, loss_function):
     # Validation!
     eval_losses = AverageMeter()
 
@@ -49,10 +49,10 @@ def valid(__C, model, writer, test_loader, global_step):
                           desc="Validating... (loss=X.X)",
                           bar_format="{l_bar}{r_bar}",
                           dynamic_ncols=True)
-    if __C.label_smoothing:
-        loss_function = LabelSmoothingCrossEntropy(__C.smoothing)
-    else:
-        loss_function = torch.nn.CrossEntropyLoss()
+    # if __C.label_smoothing:
+    #     loss_function = LabelSmoothingCrossEntropy(__C.smoothing)
+    # else:
+    #     loss_function = torch.nn.CrossEntropyLoss()
 
     for step, (images, labels) in enumerate(epoch_iterator):
         images = images.cuda()
@@ -104,6 +104,7 @@ def train_engine(__C):
         loss_function = LabelSmoothingCrossEntropy(__C.smoothing)
     else:
         loss_function = nn.CrossEntropyLoss()
+
     optimizer = optim.SGD(net.parameters(), lr=__C.lr, momentum=0.9, weight_decay=5e-4)
 
     # define optimizer scheduler
@@ -181,7 +182,7 @@ def train_engine(__C):
                 writer.add_scalar("train/lr", scalar_value=train_scheduler.get_lr()[0], global_step=global_step)
 
                 if global_step % __C.eval_every == 0:
-                    accuracy = valid(__C, model=net, writer=writer, test_loader=test_loader, global_step=global_step)
+                    accuracy = valid(__C, model=net, writer=writer, test_loader=test_loader, global_step=global_step, loss_function=loss_function)
                     if best_acc < accuracy:
                         torch.save(net.state_dict(), checkpoint_path.format(net=__C.model, global_step=global_step, type='best'))
                         best_acc = accuracy
