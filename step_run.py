@@ -15,6 +15,7 @@ def parse_args():
     parser.add_argument('--warmup_steps', type=int, default=500, help="Step of training to perform learning rate warmup for.")
     parser.add_argument('--num_steps', type=int, default=10000, help="Total number of training steps to perform")
     parser.add_argument('--max_grad_norm', type=float, default=1.0, help='Max gradient norm.')
+    parser.add_argument('--eval_every', type=int, default=200, help="eval every 200 steps")
     parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate')
     parser.add_argument('--lr_decay_rate', type=float, default=0.2, help="learning rate decay rate")
     parser.add_argument('--warmup_epoch', type=int, default=1, help='warmup epochs')

@@ -34,6 +34,7 @@ class AverageMeter(object):
 def simple_accuracy(preds, labels):
     return (preds == labels).mean()
 
+
 def valid(__C, model, writer, test_loader, global_step):
     # Validation!
     eval_losses = AverageMeter()
@@ -107,8 +108,8 @@ def train_engine(__C):
 
     # define optimizer scheduler
     # len(train_loader) 就是一个epoch的steps数量
-    total_steps = __C.epoch * len(train_loader)
-    warmup_steps = __C.epoch * len(train_loader)
+    warmup_steps = __C.warmup_steps
+    total_steps = __C.num_steps
     # change epoch into steps
     for i in __C.milestones:
         i*=len(train_loader)
@@ -126,7 +127,7 @@ def train_engine(__C):
     checkpoint_path = os.path.join(__C.ckpts_dir, __C.model, __C.version)
     if not os.path.exists(checkpoint_path):
         os.makedirs(checkpoint_path)
-    checkpoint_path = os.path.join(checkpoint_path, '{net}-{epoch}-{type}.pth')
+    checkpoint_path = os.path.join(checkpoint_path, '{net}-{global_step}-{type}.pth')
 
     # define log save dir
     log_path = os.path.join(__C.result_log_dir, __C.model)
@@ -179,7 +180,21 @@ def train_engine(__C):
                 writer.add_scalar("train/lr", scalar_value=train_scheduler.get_lr()[0], global_step=global_step)
 
                 if global_step % __C.eval_every == 0:
-                    accuracy = valid()
+                    accuracy = valid(__C, model=net, writer=writer, test_loader=test_loader, global_step=global_step)
+                    if best_acc < accuracy:
+                        torch.save(net.state_dict(), checkpoint_path.format(net=__C.model, global_step=global_step, type='best'))
+                        best_acc = accuracy
+                    net.train()
+
+                if global_step % total_steps == 0:
+                    break
+        losses.reset()
+        if global_step % total_steps == 0:
+            break
+
+    writer.close()
+    logger.info("Best Accuracy: \t%f" % best_acc)
+    logger.info("End Training!")
 
 
 
