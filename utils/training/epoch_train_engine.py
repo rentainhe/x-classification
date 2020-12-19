@@ -98,7 +98,7 @@ def train_engine(__C):
                 ))
             # update training loss for each iteration
 
-            writer.add_scalar('Train/loss', loss_tmp, n_iter)
+            writer.add_scalar('Epoch Train/loss', loss_tmp, n_iter)
 
         # update the result logfile
         logfile = open(log_path, 'a+')
@@ -157,7 +157,7 @@ def train_engine(__C):
             logfile.close()
 
             # update the tensorboard log file
-            writer.add_scalar('Test/Average loss', test_average_loss, epoch)
-            writer.add_scalar('Test/Accuracy', acc, epoch)
+            writer.add_scalar('Epoch Test/Average loss', test_average_loss, epoch)
+            writer.add_scalar('Epoch Test/Accuracy', acc, epoch)
 
 
