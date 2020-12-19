@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument('--lr_decay_rate', type=float, default=0.2, help="learning rate decay rate")
     parser.add_argument('--warmup_epoch', type=int, default=1, help='warmup epochs')
     parser.add_argument('--epoch', type=int, default=200, help='total epochs')
+    parser.add_argument('--decay_type', choices=["multistep","cosine","linear"], default="cosine", help="How to decay learning rate")
     parser.add_argument('--save_type', type=str, dest='type', choices=['best','regular'], required=False)
     parser.add_argument('--label_smoothing', action='store_true', default=False, help='if using label smoothing') # 只需要 --label_smoothing 就可以让这个值为True
     parser.add_argument('--smoothing', type=float, default=0.1, help='control label smoothing value')
