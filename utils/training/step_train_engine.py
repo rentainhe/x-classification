@@ -6,7 +6,6 @@ from datasets.dataset_loader import get_test_loader
 from models.get_network import get_network
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
-from utils.util import WarmUpLR
 from criterion import LabelSmoothingCrossEntropy
 from utils.scheduler import WarmupLinearSchedule, WarmupCosineSchedule, WarmupMultiStepSchedule
 from tqdm import tqdm
