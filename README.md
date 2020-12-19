@@ -58,29 +58,29 @@ $ python3 step_run.py --dataset cifar100 --model resnet18 --run train
 
 Addition:
 
-- ```--version=str```, e.g, ```--version test``` to set a name for this training
+- ```--version=str```, e.g, ```--version='test'``` to set a name for this training
 
-- ```--gpu=str```, e.g, ```--gpu 2``` to train the model on specified GPU device, set ```--gpu 1,2,3``` to use Multi-GPU Training 
+- ```--gpu=str```, e.g, ```--gpu='2'``` to train the model on specified GPU device, set ```--gpu='1,2,3'``` to use Multi-GPU Training 
 
-- ```--seed=int```, e.g, ```--seed 1020``` to use a fixed seed to initialize the model. Unset it results in random seeds.
+- ```--seed=int```, e.g, ```--seed=1020``` to use a fixed seed to initialize the model. Unset it results in random seeds.
 
 - ```--label_smoothing```, e.g, ```--label_smoothing``` to use label smoothing for training
 
-- ```--gradient_accumulation_steps=int```, e.g, ```--gradient_accumulation_steps 32``` to set the gradient steps to reduce the memory use
+- ```--gradient_accumulation_steps=int```, e.g, ```--gradient_accumulation_steps=32``` to set the gradient steps to reduce the memory use
 
 Specified Addition For `Epoch` Training:
 
-- ```--warmup_epoch=int```, e.g, ```--warmup_epoch 1``` to set the warmup epoches
+- ```--warmup_epoch=int```, e.g, ```--warmup_epoch=1``` to set the warmup epoches
 
-- ```--epoch=int```, e.g, ```--epoch 200``` to set the total training epoch nums
+- ```--epoch=int```, e.g, ```--epoch=200``` to set the total training epoch nums
 
 Specified Addition For `Step` Training:
 
-- ```--warmup_steps=int```, e.g, ```--warmup_steps 1000``` to set the warmup steps
+- ```--warmup_steps=int```, e.g, ```--warmup_steps=1000``` to set the warmup steps
 
-- ```--num_steps=int```, e.g, ```--num_steps 80000``` to set the total steps
+- ```--num_steps=int```, e.g, ```--num_steps=80000``` to set the total steps
 
-- ```--decay_type=str```, e.g, ```--decay_type cosine``` to use the `cosine` learning rate decay schedule
+- ```--decay_type=str```, e.g, ```--decay_type='cosine'``` to use the `cosine` learning rate decay schedule
 
 The supported net args are:
 ```
