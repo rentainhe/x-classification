@@ -1,6 +1,6 @@
 import argparse
 from conf import configs
-from utils.training.step_train_engine import train_engine
+from utils.training.step_train_engine import train_engine as step_train_engine
 
 def parse_args():
     parser = argparse.ArgumentParser(description='MAC_Classification Args')
@@ -42,4 +42,4 @@ if __name__ == '__main__':
     print(configs)
 
     if configs.run_mode == 'train':
-        train_engine(configs)
+        step_train_engine(configs)

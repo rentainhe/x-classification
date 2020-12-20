@@ -1,6 +1,7 @@
 import argparse
 from conf import configs
-from utils.training.epoch_train_engine import train_engine
+from utils.training.epoch_train_engine import train_engine as epoch_train_engine
+from utils.testing.epoch_test_engine import test_engine as epoch_test_engine
 
 def parse_args():
     parser = argparse.ArgumentParser(description='MAC_Classification Args')
@@ -21,6 +22,7 @@ def parse_args():
     parser.add_argument('--epoch', type=int, default=200, help='total epochs')
     parser.add_argument('--ckpt_e', type=int, dest='ckpt_epoch')
     parser.add_argument('--ckpt_v', type=str, dest='ckpt_version')
+    parser.add_argument('--ckpt_type', type=str, choices=['best','regular'], required=False, help='the model type you want to load and test')
     parser.add_argument('--save_type', type=str, dest='type', choices=['best','regular'], required=False)
     parser.add_argument('--label_smoothing', action='store_true', default=False, help='if using label smoothing') # 只需要 --label_smoothing 就可以让这个值为True
     parser.add_argument('--smoothing', type=float, default=0.1, help='control label smoothing value')
@@ -41,7 +43,10 @@ if __name__ == '__main__':
     print(configs)
 
     if configs.run_mode == 'train':
-        train_engine(configs)
+        epoch_train_engine(configs)
+    elif configs.run_mode == 'test':
+        epoch_test_engine(configs)
+
 
 
 
