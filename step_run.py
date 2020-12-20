@@ -43,6 +43,3 @@ if __name__ == '__main__':
 
     if configs.run_mode == 'train':
         train_engine(configs)
-
-
-
