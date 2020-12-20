@@ -5,6 +5,10 @@ import torch
 from datasets.dataset_loader import get_test_loader
 from models.get_network import get_network
 
+def count_parameters(net):
+    params = sum([param.nelement() for param in net.parameters() if param.requires_grad])
+    print("Params: %f M" % (params/1000000))
+
 def test_engine(__C):
     # define the network
     net = get_network(__C)
@@ -47,4 +51,4 @@ def test_engine(__C):
         print()
         print("Top 1 err: ", 1 - correct_1 / len(test_loader.dataset))
         print("Top 5 err: ", 1 - correct_5 / len(test_loader.dataset))
-        print("Parameter numbers: {}".format(sum(p.numel() for p in net.parameters())))
+        print("Parameter numbers: {}".format(count_parameters(net)))
