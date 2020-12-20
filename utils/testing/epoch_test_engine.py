@@ -14,7 +14,7 @@ def test_engine(__C):
     test_loader = get_test_loader(__C)
 
     # define the weight path and load weight
-    weight_path = os.path.join(__C.ckpts_dir, __C.model, __C.version)
+    weight_path = os.path.join(__C.ckpts_dir, __C.model, __C.ckpt_v)
     if not os.path.exists(weight_path):
         print("the weight doesn't exist, please check the args: --ckpt_v")
     else:
