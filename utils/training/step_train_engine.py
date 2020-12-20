@@ -80,8 +80,8 @@ def valid(__C, model, writer, test_loader, global_step, loss_function):
     logger.info("Valid Loss: %2.5f" % eval_losses.avg)
     logger.info("Valid Accuracy: %2.5f" % accuracy)
 
-    writer.add_scalar("Step Test/accuracy", scalar_value=accuracy, global_step=global_step)
-    writer.add_scalar("Step Test/loss", scalar_value=eval_losses.avg, global_step=global_step)
+    writer.add_scalar("[Step] Test/accuracy", scalar_value=accuracy, global_step=global_step)
+    writer.add_scalar("[Step] Test/loss", scalar_value=eval_losses.avg, global_step=global_step)
     return accuracy
 
 
@@ -180,8 +180,8 @@ def train_engine(__C):
                     "Training (%d / %d Steps) (loss=%2.5f)" % (global_step, total_steps, losses.val)
                 )
 
-                writer.add_scalar("Step Train/loss", scalar_value=losses.val, global_step=global_step)
-                writer.add_scalar("Step Train/lr", scalar_value=train_scheduler.get_lr()[0], global_step=global_step)
+                writer.add_scalar("[Step] Train/loss", scalar_value=losses.val, global_step=global_step)
+                writer.add_scalar("[Step] Train/lr", scalar_value=train_scheduler.get_lr()[0], global_step=global_step)
 
                 if global_step % __C.eval_every == 0:
                     accuracy = valid(__C, model=net, writer=writer, test_loader=test_loader, global_step=global_step, loss_function=loss_function)

@@ -105,11 +105,11 @@ def train_engine(__C):
                 ))
             # update training loss for each iteration
 
-            writer.add_scalar('Epoch Train/loss', loss_tmp, n_iter)
+            writer.add_scalar('[Epoch] Train/loss', loss_tmp, n_iter)
             if epoch <= __C.warmup_epoch:
-                writer.add_scalar('Epoch Train/lr', warmup_schedule.get_lr()[0], epoch)
+                writer.add_scalar('[Epoch] Train/lr', warmup_schedule.get_lr()[0], epoch)
             else:
-                writer.add_scalar('Epoch Train/lr', train_scheduler.get_lr()[0], epoch)
+                writer.add_scalar('[Epoch] Train/lr', train_scheduler.get_lr()[0], epoch)
 
         # update the result logfile
         logfile = open(log_path, 'a+')
@@ -168,7 +168,7 @@ def train_engine(__C):
             logfile.close()
 
             # update the tensorboard log file
-            writer.add_scalar('Epoch Test/Average loss', test_average_loss, epoch)
-            writer.add_scalar('Epoch Test/Accuracy', acc, epoch)
+            writer.add_scalar('[Epoch] Test/Average loss', test_average_loss, epoch)
+            writer.add_scalar('[Epoch] Test/Accuracy', acc, epoch)
 
 
