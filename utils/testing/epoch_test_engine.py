@@ -51,4 +51,4 @@ def test_engine(__C):
         print()
         print("Top 1 err: ", 1 - correct_1 / len(test_loader.dataset))
         print("Top 5 err: ", 1 - correct_5 / len(test_loader.dataset))
-        print("Parameter numbers: {}".format(count_parameters(net)))
+        count_parameters(net)
