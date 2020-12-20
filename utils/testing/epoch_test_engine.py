@@ -14,12 +14,12 @@ def test_engine(__C):
     test_loader = get_test_loader(__C)
 
     # define the weight path and load weight
-    weight_path = os.path.join(__C.ckpts_dir, __C.model, __C.ckpt_v)
+    weight_path = os.path.join(__C.ckpts_dir, __C.model, __C.ckpt_version)
     if not os.path.exists(weight_path):
         print("the weight doesn't exist, please check the args: --ckpt_v")
     else:
-        weight_path = os.path.join(weight_path,'{net}-{ckpt_e}-{type}.pth')
-        weight_path.format(net=__C.model, ckpt_e=__C.ckpt_e, type=__C.ckpt_type)
+        weight_path = os.path.join(weight_path,'{net}-{ckpt_epoch}-{type}.pth')
+        weight_path.format(net=__C.model, ckpt_epoch=__C.ckpt_epoch, type=__C.ckpt_type)
     net.load_state_dict(torch.load(weight_path))
 
     # define the statistic params
