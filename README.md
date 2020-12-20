@@ -17,14 +17,14 @@ Classification on CIFAR10 CIFAR100 and ImageNet using Pytorch
 ## Installation
 * clone
   ```
-  git clone https://github.com/rentainhe/MAC_classification.git
+  git clone https://github.com/rentainhe/Pytorch_Classification.git
   ```
 
 ## Usage
 
 ### 1. enter directory
 ```bash
-$ cd MAC_classification
+$ cd Pytorch_Classification
 ```
 
 ### 2. dataset
