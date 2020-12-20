@@ -68,6 +68,8 @@ Addition:
 
 - ```--gradient_accumulation_steps=int```, e.g, ```--gradient_accumulation_steps=32``` to set the gradient steps to reduce the memory use
 
+- ```--no_bias_decay```, e.g, ```--no_bias_decay``` to use `no bias decay` for training, only specified models work
+
 Specified Addition For `Epoch` Training:
 
 - ```--warmup_epoch=int```, e.g, ```--warmup_epoch=1``` to set the warmup epoches
