@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import torch
 from datasets.dataset_loader import get_test_loader
@@ -17,10 +18,10 @@ def test_engine(__C):
     weight_path = os.path.join(__C.ckpts_dir, __C.model, __C.ckpt_version)
     if not os.path.exists(weight_path):
         print("the weight doesn't exist, please check the args: --ckpt_v")
+        sys.exit()
     else:
         weight_path = os.path.join(weight_path,'{net}-{ckpt_epoch}-{type}.pth')
-        weight_path.format(net=__C.model, ckpt_epoch=__C.ckpt_epoch, type=__C.ckpt_type)
-    net.load_state_dict(torch.load(weight_path))
+    net.load_state_dict(torch.load(weight_path.format(net=__C.model, ckpt_epoch=__C.ckpt_epoch, type=__C.ckpt_type)))
 
     # define the statistic params
     correct_1 = 0.0
