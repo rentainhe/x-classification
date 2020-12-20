@@ -90,6 +90,7 @@ resnet50
 mobilenet
 mobilenetv2
 shufflenet
+senet(se-resnet)
 ```
 
 ## Implementated NetWork
@@ -97,3 +98,4 @@ shufflenet
 - resnet [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385v1)
 - mobilenet [MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications](https://arxiv.org/abs/1704.04861)
 - shufflenet [ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices](https://arxiv.org/abs/1707.01083v2)
+- senet [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)
