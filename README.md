@@ -93,6 +93,24 @@ shufflenet
 senet(se-resnet)
 ```
 
+### 5. testing
+In this repo, we offer two kinds of testing method: `Epoch Testing` and `Step Testing` which corresponds to `epoch training` and `step training` 
+
+Here is an example which tests trained `resnet18` model on `cifar100` using `Epoch Testing`
+```bash
+$ python3 epoch_run.py --dataset cifar100 --model resnet18 --run test --ckpt_e={epoch} --ckpt_v={version} --ckpt_type best 
+```
+
+Details of `Epoch Testing` method:
+
+- ```--run='test'```, run mode must be `test`
+
+- ```--ckpt_e=int```, the ckpt_e must be specified which corresponds to the epoch of the loaded moel
+
+- ```--ckpt_v=str```, the ckpt_v must be specified which corresponds to the version of the loaded model
+
+- ```--ckpt_type={'best', 'regular'}```, the ckpt_type should correspond to the type of the loaded model
+
 ## Implementated NetWork
 
 - resnet [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385v1)

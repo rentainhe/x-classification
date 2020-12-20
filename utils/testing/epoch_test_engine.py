@@ -30,7 +30,6 @@ def test_engine(__C):
     # define the statistic params
     correct_1 = 0.0
     correct_5 = 0.0
-    total = 0
     with torch.no_grad():
         for step, (images, labels) in enumerate(test_loader):
             print("iteration: {}\ttotal {} iterations".format(step + 1, len(test_loader)))
