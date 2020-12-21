@@ -11,5 +11,3 @@ def get_network(__C):
     except ImportError:
         print('the network name you have entered is not supported yet')
         sys.exit()
-
-print(1)
