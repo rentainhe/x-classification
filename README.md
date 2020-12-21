@@ -1,4 +1,4 @@
-# Mac Classification
+# Pytorch Classification
 Classification on CIFAR10 CIFAR100 and ImageNet using Pytorch
 
 ## Features
