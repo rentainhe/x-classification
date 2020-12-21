@@ -1,5 +1,5 @@
 # Pytorch Classification
-Classification on CIFAR10 CIFAR100 and ImageNet using Pytorch
+Classification on `CIFAR10` `CIFAR100` and `ImageNet` using Pytorch
 
 ## Features
 * Two training ways
