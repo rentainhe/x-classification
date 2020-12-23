@@ -1,6 +1,4 @@
-from models.net.resnet import resnet18
-from models.net.resnet import resnet34
-from models.net.resnet import resnet50
+from models.net.resnet import *
 from models.net.mobilenet import mobilenet
 from models.net.shufflenet import shufflenet
 from models.net.mobilenetv2 import mobilenetv2

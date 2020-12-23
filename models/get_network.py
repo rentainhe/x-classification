@@ -14,7 +14,7 @@ def get_network(__C):
 
 # class config:
 #     def __init__(self):
-#         self.model = 'ghostnet'
+#         self.model = 'resnet18'
 #
 # c = config()
 # get_network(c)
