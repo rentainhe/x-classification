@@ -13,9 +13,9 @@ ckpts_dir = 'ckpts'
 tensorboard_log_dir = 'runs'
 
 # training configs
-epoch = 200
-milestones = [60, 120, 160] # 30%, 60%, 80%
-save_epoch = 10
+epoch = 150
+milestones = [45, 90, 135] # 30%, 60%, 80%
+save_epoch = 15
 gpu = '0'
 seed = random.randint(0, 9999999)
 version = str(seed)
