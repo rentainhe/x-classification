@@ -188,11 +188,13 @@ class MobileNetV3_Small(nn.Module):
         return out
 
 
+def mobilenetv3():
+    return MobileNetV3_Small()
 
-def test():
-    net = MobileNetV3_Small()
-    x = torch.randn(2,3,224,224)
-    y = net(x)
-    print(y.size())
-
-test()
+# def test():
+#     net = MobileNetV3_Small()
+#     x = torch.randn(2,3,224,224)
+#     y = net(x)
+#     print(y.size())
+#
+# test()
