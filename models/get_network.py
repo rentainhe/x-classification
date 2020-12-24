@@ -2,6 +2,7 @@ import os
 import sys
 import importlib
 from importlib import import_module
+import torch
 
 def get_network(__C):
     try:
@@ -12,9 +13,11 @@ def get_network(__C):
         print('the network name you have entered is not supported yet')
         sys.exit()
 
-# class config:
-#     def __init__(self):
-#         self.model = 'ghostnet'
-#
-# c = config()
-# get_network(c)
+class config:
+    def __init__(self):
+        self.model = 'resnet50'
+
+c = config()
+model = get_network(c)
+x = torch.randn(1,3,224,224)
+print(model(x).size())
