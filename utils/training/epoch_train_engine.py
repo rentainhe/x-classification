@@ -55,10 +55,14 @@ def train_engine(__C):
         os.makedirs(log_path)
     log_path = os.path.join(log_path,__C.version+'.txt')
 
-    # write the hyper parameters to log
+    # write the hyper-parameters to log
     logfile = open(log_path, 'a+')
     logfile.write(str(__C))
     logfile.close()
+
+    # if using pytorch-mixed_up-training create a scalar
+    if __C.mixed_training:
+        scalar = torch.cuda.amp.GradScaler()
 
     best_acc = 0.0
     loss_sum = 0
@@ -83,15 +87,27 @@ def train_engine(__C):
                                     (accu_step + 1) * __C.sub_batch_size]
                 sub_labels = labels[accu_step * __C.sub_batch_size:
                                     (accu_step + 1) * __C.sub_batch_size]
-                outputs = net(sub_images)
-                loss = loss_function(outputs, sub_labels)
-                loss.backward()
+
+                if __C.mixed_training:
+                    with torch.cuda.amp.autocast():
+                        outputs = net(sub_images)
+                        loss = loss_function(outputs, sub_labels)
+                    scalar.scale(loss).backward()
+                else:
+                    outputs = net(sub_images)
+                    loss = loss_function(outputs, sub_labels)
+                    loss.backward()
                 # loss_tmp += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
                 # loss_sum += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
                 loss_tmp += loss.cpu().data.numpy()
                 loss_sum += loss.cpu().data.numpy()
 
-            optimizer.step()
+            if __C.mixed_training:
+                scalar.step(optimizer)
+                scalar.update()
+            else:
+                optimizer.step()
+
             n_iter = (epoch-1) * len(train_loader) + step + 1
             print(
                 '[{Version}] [{Model}] Training Epoch: {epoch} [{trained_samples}/{total_samples}]\tLoss: {:0.4f}\tLR: {:0.6f}'.format(
