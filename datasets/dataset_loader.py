@@ -32,7 +32,8 @@ def get_train_loader(configs):
                               sampler=train_sampler,
                               batch_size=configs.batch_size,
                               num_workers=configs.num_workers,
-                              pin_memory=configs.pin_memory)
+                              pin_memory=configs.pin_memory,
+                              drop_last=True)
     return train_loader
 
 def get_test_loader(configs):
@@ -61,5 +62,6 @@ def get_test_loader(configs):
                              sampler=test_sampler,
                              batch_size=configs.eval_batch_size,
                              num_workers=configs.num_workers,
-                             pin_memory=configs.pin_memory)
+                             pin_memory=configs.pin_memory,
+                             drop_last=False)
     return test_loader

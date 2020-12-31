@@ -159,8 +159,9 @@ You could decrese the batchsize to 64 or whatever suits you or change the traini
 ## Results
 ### Epoch Training Results
 #### Resnet
-|dataset|network|params|epochs|label-smoothing|mixed-precision training|accuracy
+|dataset|network|params|warmup-epochs|total-epochs|label-smoothing|accuracy
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:
+|cifar100|resnet18|11.2M|1|200|False|
 
 
 ### Step Training Results
