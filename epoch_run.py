@@ -27,7 +27,7 @@ def parse_args():
     parser.add_argument('--label_smoothing', action='store_true', default=False, help='if using label smoothing') # 只需要 --label_smoothing 就可以让这个值为True
     parser.add_argument('--smoothing', type=float, default=0.1, help='control label smoothing value')
     parser.add_argument('--no_bias_decay', action='store_true', default=False, help='if using no bias decay')
-    parser.add_argument('--mix', dest='mixed_training', default=False, type=str, help='if using mixed-up training, Pytorch >= 1.6')
+    parser.add_argument('--mix', dest='mixed_training', action='store_true', default=False, help='if using mixed-up training, Pytorch >= 1.6')
     args = parser.parse_args()
     return args
 
