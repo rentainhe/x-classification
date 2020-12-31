@@ -1,10 +1,12 @@
 import torch.nn as nn
-
+import torch
 class BasicBlock(nn.Module):
     # Residual block for resnet18 and resnet 34
     expansion = 1 # 维度拓展
     def __init__(self, in_channels, out_channels, stride=1):
         super().__init__()
+        print("in_channels,out_channels ", in_channels,' ',out_channels)
+
         # residual function
         self.residual_function = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False),
@@ -26,11 +28,14 @@ class BasicBlock(nn.Module):
     def forward(self, x):
         return nn.ReLU(inplace=True)(self.residual_function(x) + self.shortcut(x))
 
+
+
 class BottleNeck(nn.Module):
     # Residual block for resnet over 50 layers
     # 瓶颈层，因为用了 1*1 的卷积，比较方便改变网络的大小，先降维后升维，将高频噪声消除，并且减少计算量，在深层网络上常用
     expansion=4
     def __init__(self, in_channels, out_channels, stride=1):
+        print("in_channels, out_channels, strides,{}, {}, {}".format(in_channels, out_channels, stride))
         super().__init__()
         self.residual_function = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
@@ -89,6 +94,7 @@ class ResNet(nn.Module):
         strides = [stride] + [1]*(num_blocks-1)
         layers = []
         for stride in strides:
+            # print(stride)
             layers.append(block(self.in_channels, out_channels, stride))
             self.in_channels = out_channels * block.expansion
 
@@ -120,3 +126,13 @@ def resnet34():
 def resnet50():
     # return a resnet50 object
     return ResNet(BottleNeck, [3,4,6,3])
+
+def count_parameters(net):
+    params = sum([param.nelement() for param in net.parameters() if param.requires_grad])
+    print("Params: %f M" % (params/1000000))
+
+model = resnet50()
+model.eval()
+count_parameters(model)
+x = torch.randn(1,3,224,224)
+print(model(x).size())

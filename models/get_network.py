@@ -3,6 +3,7 @@ import sys
 import importlib
 from importlib import import_module
 import torch
+from torchvision.models import resnet50
 
 def get_network(__C):
     try:
@@ -15,9 +16,14 @@ def get_network(__C):
 
 class config:
     def __init__(self):
-        self.model = 'resnet50'
+        self.model = 'our50'
+def count_parameters(net):
+    params = sum([param.nelement() for param in net.parameters() if param.requires_grad])
+    print("Params: %f M" % (params/1000000))
 
 c = config()
 model = get_network(c)
+# model = resnet50(num_classes=100)
 x = torch.randn(1,3,224,224)
+count_parameters(model)
 print(model(x).size())
