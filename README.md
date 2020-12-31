@@ -11,7 +11,7 @@ Classification on `CIFAR10` `CIFAR100` and `ImageNet` using Pytorch
 
 ## Requirements
 * python3.6
-* pytorch1.6.0 + Cuda10.1
+* pytorch1.6.0 + cuda10.1
 * tensorboard 2.3.0
 
 ## Installation
@@ -137,3 +137,32 @@ Details of `Epoch Testing` method:
 - shufflenet [ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices](https://arxiv.org/abs/1707.01083v2)
 - senet [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)
 - densenet [Densely Connected Convolutional Networks](https://arxiv.org/pdf/1608.06993.pdf)
+
+## Training Details
+- init `epoch=200`
+- init `lr = 0.1` divide by `5` at `60th, 120th, 160th` epochs
+- `batchsize 128`
+- `weight decay=5e-4`, 
+- Nesterov `momentum=0.9` 
+
+more common use:
+
+- initial `lr = 0.1`, lr divied by `10` at `150th` and `225th` epochs, and training for `300 epochs` with `batchsize 128`
+
+You could decrese the batchsize to 64 or whatever suits you or change the training details in `./conf/global_configs.py`
+
+## Training Related Work
+- [Improved Regularization of Convolutional Neural Networks with Cutout](https://arxiv.org/abs/1708.04552v2)
+- [Regularizing Neural Networks by Penalizing Confident Output Distributions](https://arxiv.org/abs/1701.06548v1)
+- [Random Erasing Data Augmentation](https://arxiv.org/abs/1708.04896v2)
+
+## Results
+### Epoch Training Results
+#### Resnet
+|dataset|network|params|epochs|label-smoothing|mixed-precision training|accuracy
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:
+
+
+### Step Training Results
+|dataset|network|params|warmup-steps|total-steps|label-smoothing|accuracy
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:

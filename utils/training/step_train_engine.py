@@ -144,7 +144,7 @@ def train_engine(__C):
     logfile.close()
 
     # Train!
-    logger.info("***** Running training *****")
+    logger.info("  ***** Running training *****")
     logger.info("  Total optimization steps = %d", __C.num_steps)
     logger.info("  Instantaneous batch size per GPU = %d", __C.batch_size)
     logger.info("  Gradient Accumulation steps = %d", __C.gradient_accumulation_steps)
@@ -163,6 +163,7 @@ def train_engine(__C):
             labels = labels.cuda()
             train_outputs = net(images)
             loss = loss_function(train_outputs, labels)
+
             if __C.gradient_accumulation_steps > 1:
                 loss = loss / __C.gradient_accumulation_steps
             else:
