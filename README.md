@@ -7,7 +7,7 @@ Classification on `CIFAR10` `CIFAR100` and `ImageNet` using Pytorch
   * step training: training network using __fixed steps__ _( warmup_steps/total_steps= 1000/80000 )_
 * Multi-GPU support
 * Easy and Useful Training log file
-* Support Different Training Schedule _( multi-step / cosine / linear )_
+* Support Different Training Schedule ( `multi-step` / `cosine` / `linear` )
 
 ## Requirements
 * python3.6
@@ -45,6 +45,11 @@ Here is an example which trains a `resnet18` on the `cifar100` dataset using `ep
 $ python3 epoch_run.py --dataset cifar100 --model resnet18 --run train
 ```
 
+Here is an example of mixed-precision training (only support `epoch training loop` now):
+```bash
+$ python3 epoch_run.py --dataset cifar100 --model resnet18 --run train --mix
+```
+
 Here is an example which trains a `resnet18` on the `cifar100` dataset using `step training loop`
 ```bash
 $ python3 step_run.py --dataset cifar100 --model resnet18 --run train
@@ -76,6 +81,8 @@ Specified Addition For `Epoch` Training:
 
 - ```--epoch=int```, e.g, ```--epoch=200``` to set the total training epoch nums
 
+- ```--mix=False```, e.g, ```--mix``` to use mixed-precision training for accelerating, make sure your Pytorch version >= 1.6
+
 Specified Addition For `Step` Training:
 
 - ```--warmup_steps=int```, e.g, ```--warmup_steps=1000``` to set the warmup steps
@@ -91,8 +98,13 @@ resnet34
 resnet50
 mobilenet
 mobilenetv2
+mobilenetv3
 shufflenet
-senet(se-resnet)
+seresnet18
+seresnet34
+seresnet50
+seresnet101
+seresnet152
 densenet121
 densenet169
 densenet201
@@ -121,6 +133,7 @@ Details of `Epoch Testing` method:
 
 - resnet [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385v1)
 - mobilenet [MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications](https://arxiv.org/abs/1704.04861)
+- mobilenetv3 [Searching for MobileNetV3](https://arxiv.org/pdf/1905.02244.pdf)
 - shufflenet [ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices](https://arxiv.org/abs/1707.01083v2)
 - senet [Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)
-- densenet
+- densenet [Densely Connected Convolutional Networks](https://arxiv.org/pdf/1608.06993.pdf)
