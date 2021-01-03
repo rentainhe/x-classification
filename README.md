@@ -106,6 +106,9 @@ seresnet34
 seresnet50
 seresnet101
 seresnet152
+resnext50
+resnext101
+resnext152
 densenet121
 densenet169
 densenet201
