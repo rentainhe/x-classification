@@ -161,7 +161,7 @@ You could decrese the batchsize to 64 or whatever suits you or change the traini
 #### Resnet
 |dataset|network|params|warmup-epochs|total-epochs|label-smoothing|accuracy
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:
-|cifar100|resnet18|11.2M|1|200|False|
+|cifar100|resnet18|11.2M|1|200|False|73.71%
 
 
 ### Step Training Results
