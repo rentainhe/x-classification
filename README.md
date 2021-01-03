@@ -13,6 +13,7 @@ Classification on `CIFAR10` `CIFAR100` and `ImageNet` using Pytorch
 * python3.6
 * pytorch1.6.0 + cuda10.1
 * tensorboard 2.3.0
+* ptflops
 
 ## Installation
 * clone
@@ -129,6 +130,13 @@ Details of `Epoch Testing` method:
 
 - ```--ckpt_type={'best', 'regular'}```, the ckpt_type should correspond to the type of the loaded model
 
+### 6. Network information
+if you want to know the params and flops of your net, here is an example:
+```bash
+$ python3 counter.py --model resnet18
+```
+make sure you have already installed `ptflops`
+
 ## Implementated NetWork
 
 - resnet [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385v1)
@@ -139,11 +147,11 @@ Details of `Epoch Testing` method:
 - densenet [Densely Connected Convolutional Networks](https://arxiv.org/pdf/1608.06993.pdf)
 
 ## Training Details
-- init `epoch=200`
-- init `lr = 0.1` divide by `5` at `60th, 120th, 160th` epochs
+- `epoch=200`
+- `lr = 0.1` divide by `5` at `60th`, `120th`, `160th` epochs
 - `batchsize 128`
 - `weight decay=5e-4`, 
-- Nesterov `momentum=0.9` 
+- `Nesterov momentum=0.9` 
 
 more common use:
 
