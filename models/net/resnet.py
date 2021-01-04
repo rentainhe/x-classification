@@ -126,13 +126,3 @@ def resnet34():
 def resnet50():
     # return a resnet50 object
     return ResNet(BottleNeck, [3,4,6,3])
-
-def count_parameters(net):
-    params = sum([param.nelement() for param in net.parameters() if param.requires_grad])
-    print("Params: %f M" % (params/1000000))
-
-model = resnet50()
-model.eval()
-count_parameters(model)
-x = torch.randn(1,3,224,224)
-print(model(x).size())
