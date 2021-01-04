@@ -1,54 +1,39 @@
-# Pytorch Classification
-Classification on `CIFAR10` `CIFAR100` and `ImageNet` using Pytorch
+# X-Classification
+A highly efficient and light-weight yet thorough classification framework built upon [PyTorch](https://pytorch.org/). **Note: this repository is in active development, feel free to open an issue and we'll reach to you as soon as possible**.
 
 ## Features
-* Two training ways
-  * epoch training: training network using __fixed epoches__ _( warmup_epoch/epoch= 1/200 )_
-  * step training: training network using __fixed steps__ _( warmup_steps/total_steps= 1000/80000 )_
-* Multi-GPU support
-* Easy and Useful Training log file
-* Support Different Training Schedule ( `multi-step` / `cosine` / `linear` )
-
-## Requirements
-* python3.6
-* pytorch1.6.0 + cuda10.1
-* tensorboard 2.3.0
-* ptflops
+* Bag of training tricks
+* Various classification datasets, preprocessing procedures, models, training settings (different optimizers and hyperparameters).
+* Support [NVIDIA-DALI](https://docs.nvidia.com/deeplearning/dali/user-guide/docs/) for eliminating data loading and preprocessing bottleneck (high gpu utility).
+* Support DistributedDataParallel with seamless checkpointing, logging and visulization.
+* Easy and flexible to build your own research projects based upon X-Classification.
 
 ## Installation
-* clone
-  ```
-  git clone https://github.com/rentainhe/Pytorch_Classification.git
-  ```
+see [Installation-Guide]() for details.
 
-## Usage
-
-### 1. enter directory
-```bash
-$ cd Pytorch_Classification
+## Quick Start
+Train and validate on ImageNet1k using MobileNetV2:
+```
+python run.py --config ./configs/imagenet1k-mobilenetv2.yaml 
+```
+Train and validate on CIFAR10 using GhostNet:
+```
+python run.py --config ./configs/cifar10-ghostnet.yaml
+```
+Train and validate on CIFAR100 using ResNet18:
+```
+python run.py --config ./configs.cifar100-resnet18.yaml
 ```
 
-### 2. dataset
-* Only support cifar10 and cifar100 now (Will support Imagenet Later)
-* Using cifar10 and cifar100 dataset from torchvision since it's more convinient
+## Advanced Topics
+* [Hyperparameters]() for an explanation of hyperparameters' meaning and best practice to set them.
+* [CustomizedComponents]() for adding your own datasets, preprocessing procedures, optimizers ande models.
 
-### 3. run tensorboard
-Install tensorboard
-```bash
-$ pip install tensorboard
-Run tensorboard
-$ tensorboard --logdir runs --port 6006 --host localhost
-```
 
 ### 4. training
 Here is an example which trains a `resnet18` on the `cifar100` dataset using `epoch training loop` 
 ```bash
 $ python3 epoch_run.py --dataset cifar100 --model resnet18 --run train
-```
-
-Here is an example of mixed-precision training (only support `epoch training loop` now):
-```bash
-$ python3 epoch_run.py --dataset cifar100 --model resnet18 --run train --mix
 ```
 
 Here is an example which trains a `resnet18` on the `cifar100` dataset using `step training loop`
