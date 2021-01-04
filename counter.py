@@ -15,10 +15,16 @@ def parse_args():
     return args
 
 if __name__ == '__main__':
+
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     args = parse_args()
-    with torch.cuda.device(0):
-          net = get_network(args)
-          macs, params = get_model_complexity_info(net, (3, 224, 224), as_strings=True,
-                                                   print_per_layer_stat=True, verbose=True)
-          print('{:<30}  {:<8}'.format('Computational complexity: ', macs))
-          print('{:<30}  {:<8}'.format('Number of parameters: ', params))
+    if device == 'cpu':
+        net = get_network(args)
+        count_parameters(net)
+    else:
+        with torch.cuda.device(0):
+              net = get_network(args)
+              macs, params = get_model_complexity_info(net, (3, 224, 224), as_strings=True,
+                                                       print_per_layer_stat=True, verbose=True)
+              print('{:<30}  {:<8}'.format('Computational complexity: ', macs))
+              print('{:<30}  {:<8}'.format('Number of parameters: ', params))

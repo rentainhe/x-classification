@@ -177,6 +177,8 @@ You could decrese the batchsize to 64 or whatever suits you or change the traini
 |cifar100|resnet50|23.7M|1|200|False|74.11%
 |cifar100|resnext50|14.7M|1|200|False|76.35%
 |cifar100|seresnet18|11.3M|1|200|False|74.56%
+|cifar100|shufflenet|1.01M|1|200|False|69.37%
+|cifar100|mobilenet|3.3M|1|200|False|65.50%
 
 
 ### Step Training Results
