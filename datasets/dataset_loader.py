@@ -6,9 +6,9 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 def get_train_loader(configs):
     # data transforms
     transform_train = transforms.Compose([
-        # transforms.RandomCrop(configs.img_size, padding=4),
-        transforms.RandomResizedCrop((configs.img_size, configs.img_size)),
-        transforms.RandomHorizontalFlip(),
+        transforms.RandomCrop(configs.img_size, padding=4),
+        # transforms.RandomResizedCrop((configs.img_size, configs.img_size)),
+        # transforms.RandomHorizontalFlip(),
         # transforms.RandomRotation(15),
         transforms.ToTensor(),
         transforms.Normalize(configs.mean, configs.std)

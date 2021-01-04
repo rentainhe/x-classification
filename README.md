@@ -31,6 +31,15 @@ $ cd X-Classification
 ### 2. dataset
 * Only support cifar10 and cifar100 now (Will support Imagenet Later)
 * Using cifar10 and cifar100 dataset from torchvision since it's more convinient
+* for `cifar10` and `cifar100` we introduce you to follow this transform method:
+```python
+from torchvision import transforms
+transform_train = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=...,std=...)
+    ])
+```
 
 ### 3. run tensorboard
 Install tensorboard
