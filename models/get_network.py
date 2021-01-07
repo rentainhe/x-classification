@@ -16,7 +16,7 @@ def get_network(__C):
 
 # class config:
 #     def __init__(self):
-#         self.model = 'our50'
+#         self.model = 'lambda_resnet50'
 # def count_parameters(net):
 #     params = sum([param.nelement() for param in net.parameters() if param.requires_grad])
 #     print("Params: %f M" % (params/1000000))
@@ -24,6 +24,6 @@ def get_network(__C):
 # c = config()
 # model = get_network(c)
 # # model = resnet50(num_classes=100)
-# x = torch.randn(1,3,224,224)
+# x = torch.randn(1,3,32,32)
 # count_parameters(model)
 # print(model(x).size())

@@ -6,3 +6,4 @@ from models.net.senet import *
 from models.net.ghostnet import ghostnet
 from models.net.densenet import *
 from models.net.resnext import *
+from models.net.lambdanetwork import *
