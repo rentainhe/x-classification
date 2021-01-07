@@ -18,14 +18,14 @@ Classification on `CIFAR10` `CIFAR100` and `ImageNet` using Pytorch
 ## Installation
 * clone
   ```
-  git clone https://github.com/x-multimodal/X-Classification.git
+  git clone https://github.com/x-multimodal/x-classification.git
   ```
 
 ## Usage
 
 ### 1. enter directory
 ```bash
-$ cd X-Classification
+$ cd x-classification
 ```
 
 ### 2. dataset
