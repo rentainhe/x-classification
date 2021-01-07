@@ -169,7 +169,7 @@ class GhostNet(nn.Module):
 
         # building first layer
         output_channel = _make_divisible(16 * width, 4)
-        self.conv_stem = nn.Conv2d(3, output_channel, 3, 2, 1, bias=False)
+        self.conv_stem = nn.Conv2d(3, output_channel, 3, 2, 1, bias=False) # cifar100和cifar10时这一层stride设置为1
         self.bn1 = nn.BatchNorm2d(output_channel)
         self.act1 = nn.ReLU(inplace=True)
         input_channel = output_channel
@@ -224,7 +224,7 @@ def ghostnet(**kwargs):
         # stage1
         [[3, 16, 16, 0, 1]],
         # stage2
-        [[3, 48, 24, 0, 2]],
+        [[3, 48, 24, 0, 2]], # cifar100和cifar10时这一层stride设置为1
         [[3, 72, 24, 0, 1]],
         # stage3
         [[5, 72, 40, 0.25, 2]],

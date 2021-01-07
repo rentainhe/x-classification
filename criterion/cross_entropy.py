@@ -23,14 +23,14 @@ class LearnableLabelSmoothingCrossEntropy(nn.Module):
     NLL loss with label smoothing.
     """
 
-    def __init__(self, smoothing=0.1, n_component=3):
+    def __init__(self, smoothing=0.1, n_component=3, num_classes=1000):
         """
         Constructor for the LabelSmoothing module.
         :param smoothing: label smoothing factor
         """
         super(LearnableLabelSmoothingCrossEntropy, self).__init__()
         assert smoothing < 1.0
-        self.n_classes = 1000
+        self.n_classes = num_classes
         self.smoothing = smoothing
         self.confidence = 1. - smoothing
         self.sampler = []
