@@ -143,11 +143,17 @@ Details of `Epoch Testing` method:
 - ```--ckpt_type={'best', 'regular'}```, the ckpt_type should correspond to the type of the loaded model
 
 ### 6. Network information
-if you want to know the params and flops of your net, here is an example:
+There are two ways for you to know the information of your network:
 ```bash
-$ python3 counter.py --model resnet18
+$ python counter.py --model resnet18 --gpu 1
 ```
-make sure you have already installed `ptflops`
+
+- `ptflops` need GPUs, you can use `--gpu=1` to set the test on specific GPU
+
+```bash
+$ python net_stat.py --model resnet18 --gpu 1
+```
+make sure you have already installed `ptflops`, `torchstat`
 
 ## Implementated NetWork
 
