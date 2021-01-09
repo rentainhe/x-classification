@@ -92,10 +92,12 @@ def train_engine(__C):
                     with torch.cuda.amp.autocast():
                         outputs = net(sub_images)
                         loss = loss_function(outputs, sub_labels)
+                        loss = loss / __C.gradient_accumulation_steps
                     scalar.scale(loss).backward()
                 else:
                     outputs = net(sub_images)
                     loss = loss_function(outputs, sub_labels)
+                    loss = loss / __C.gradient_accumulation_steps
                     loss.backward()
                 # loss_tmp += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
                 # loss_sum += loss.cpu().data.numpy() * __C.gradient_accumulation_steps
